@@ -1,6 +1,7 @@
 <?php
-
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,13 +29,11 @@ Route::get('welcome',function (){
     return view('welcome');
 });
 
-Route::get('/posts', [App\Http\Controllers\PostController::class, 'index']);
-
 Route::get('/db-posts', [App\Http\Controllers\PostController::class, 'showPosts']);
 
-Route::get('/post/create', [App\Http\Controllers\PostController::class, 'create']);
-Route::post('/post', [App\Http\Controllers\PostController::class, 'store']);
 Route::get('/admin', function () {
     return '這是管理頁面';
 })->middleware('auth');
+Route::resource('posts', PostController::class);
+
 

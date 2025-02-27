@@ -10,32 +10,45 @@ class PostController extends Controller
 {
     public function index() 
     {
-        $posts=[
-            ['title' => 'Laravel 範例1','content'=>'這是第一篇文章內容'],
-            ['title' => 'Laravel 範例2','content'=>'這是第二篇文章內容']
-        ];
-        return view('posts.index',compact('posts'));
-    }
-    public function showPosts()
-    {
-        // 從資料庫取得所有文章
-        $posts = Post::all();
-        return view('posts.index', compact('posts'));
+        $posts=Post::all();
+        return view('posts.index',['posts'=>Post::all()]);
     }
     public function create()
     {
-        return view('posts.create');
+        return view('posts.create',['user'=>auth()->user() ?? null]);
     }
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'title'=>'required|max:255',
-            'content'=>'required'
+        $request->validate([
+            'title'=>'required',
+            'content'=>'required',
         ]);
-        post::create($data);
-        return redirect('/posts');
+        Post::create([
+            'title' => $request->title,
+            'content' => $request->content, // ✅ 確保 content 被正確儲存
+        ]);
+        return redirect()->route('posts.index')->with('success','文章已新增');
 
     }
-
-
+    public function show(Post $post){
+        return view('posts.show',compact('post'));
+    }
+    public function edit(Post $post)
+    {
+        return view('posts.edit',compact('post'));
+    }
+    public function update(Request $request,Post $post)
+    {
+        $request->validate([
+            'title'=>'required',
+            'content'=>'required',
+        ]);
+        $post->update($request->all());
+        return redirect()->route('posts.index')->with('success','文章已更新');
+    }
+    public function destroy(Post $post)
+    {
+        $post->delete();
+        return redirect()->route('posts.index')->with('success','文章已刪除');
+    }
 }
